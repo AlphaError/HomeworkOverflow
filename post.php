@@ -2,6 +2,9 @@
 <?php
     session_start();
     include "functions.php";
+
+    $conn = sql_connect();
+
     console_debug("session id: " . $_SESSION["user"]);
 
     //create variables for each field
@@ -39,7 +42,20 @@
 
         Question: <input type="text" name="body"><br>
 
-        Category: <select cat="cat"></select>
+        Category: <select cat="cat">
+            <option value="select">Select</option>
+            <?php
+                //sql query to find all categories
+                $sql = "SELECT DISTINCT cat FROM Categories";
+                $result = $conn->query($sql);
+                
+                // output data of each row
+                while($row = $result->fetch_assoc()) {
+                    console_debug($row['cat']);
+                }
+                
+            ?>
+        </select>
 
         <br><span class="error">* required</span><br><br>
 
