@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<?php
+    session_start();
+    include "functions.php";
+    console_debug("session id: " . $_SESSION["user"]);
+
+    //create variables for each field
+    $title = "";
+    $body = "";
+
+    //error message variables
+    $titleErr = "";
+
+    //boolean
+    $valid = TRUE;
+
+    //if forms are submitted
+    if($_SERVER["REQUEST_METHOD"] == "POST") {
+        //check for title errors
+        if (empty($_POST["title"])) {
+            $titleErr = "Question title is required";
+            $valid = false;
+        } else {
+            $title = input_validation($_POST["title"]);
+            console_debug($title);
+        }
+    }
+?>
+
+<html>
+    <body>
+    <style>
+        .error {color: #FF0000;}
+    </style>
+    <h1>Post a New Question</h1>
+    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
+        Title: <input type="text" name="title">
+        <span class="error">* <?php echo $titleErr;?></span><br>
+
+        Question: <input type="text" name="body"><br>
+
+        Category: <select cat="cat"></select>
+
+        <br><span class="error">* required</span><br><br>
+
+        <input type="submit">
+    </form>
+    </body>
+</html>
