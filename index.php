@@ -14,7 +14,7 @@
             }
             .sidenav {
                 height: 100%;
-                width: 180px;
+                width: 200px;
                 position: fixed;
                 z-index: 1;
                 top: 0;
@@ -26,7 +26,7 @@
             .sidenav a {
                 padding: 6px 8px 6px 16px;
                 text-decoration: none;
-                font-size: 26px;
+                font-size: 24px;
                 color: #818181;
                 display: block;
             }
@@ -34,7 +34,7 @@
                 color: #f1f1f1;
             }
             .main {
-                margin-left: 180px; /* Same as the width of the sidenav */
+                margin-left: 210px; /* Same as the width of the sidenav */
                 font-size: 28px; /* Increased text to enable scrolling */
                 padding: 0px 10px;
             }
@@ -46,11 +46,12 @@
     </head>
     <div class="sidenav">
         <?php
-        echo "<br> Find your question: <br>";
+        echo "<br><a href=index.php>Home</a><br>";
         echo "<a href='browse.php?cat='>Browse</a><br>";
         echo "<a href='search.php?keywords='>Search</a><br>";
         if($_SESSION["user"] == ""){
           echo "<a href='login.php'>Login</a><br>";
+            echo "<a href='register.php'>Create Account</a>";
         } else {
           echo "<a href='profile.php?u=". $_SESSION["user"] ."'>View Profile</a><br>";
           echo "<a href='logout.php'>Logout</a><br>";

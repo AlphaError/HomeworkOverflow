@@ -23,26 +23,26 @@ $USER_TIERS = array("basic" => 20, "intermediate" => 50, "advanced" => 100);
 
 // Queries
 //Question 3:
-// $sql = "SELECT * FROM Posts";
-// $result = $conn->query($sql);
+ $sql = "SELECT * FROM Posts";
+ $result = $conn->query($sql);
  
-// if ($result->num_rows > 0) {
-//   // output data of each row
-//   while($row = $result->fetch_assoc()) {
-//     $num_posts = $row['num_posts'];
-//     echo "<br> ", $row['username'], " ", $row['num_posts'], " ";
-//     if($num_posts < $USER_TIERS["basic"]){
-//       echo "basic";
-//     } else if($num_posts < $USER_TIERS["intermediate"]){
-//       echo "intermediate";
-//     } else {
-//       echo "expert";
-//     }
-//     echo " </br>\n";
-//   }
-// } else {
-//   echo "0 results";
-// }
+ if ($result->num_rows > 0) {
+   // output data of each row
+   while($row = $result->fetch_assoc()) {
+     $num_posts = $row['num_posts'];
+     echo "<br> ", $row['username'], " ", $row['num_posts'], " ";
+     if($num_posts < $USER_TIERS["basic"]){
+       echo "basic";
+     } else if($num_posts < $USER_TIERS["intermediate"]){
+       echo "intermediate";
+     } else {
+       echo "expert";
+     }
+     echo " </br>\n";
+   }
+ } else {
+   echo "0 results";
+ }
 
 // Question 6:
 $sql = "CREATE TEMPORARY TABLE keywords(word varchar(24));";
