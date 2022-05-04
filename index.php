@@ -63,5 +63,4 @@
         <h1>Homework Overflow</h1>
         <h3>   aka Kora and Michael's amazing database project that helps you get homework answers!</h3>
     </div>
-</html
-
+</html>
