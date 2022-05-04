@@ -13,6 +13,29 @@
     //connect to SQL server
     $conn = sql_connect();
 
+    // calculating user's rank
+    $rank = "*Error*";
+    $USER_TIERS = array("Beginner" => 20, "Intermediate" => 50, "Expert" => 100);
+
+    $sql = "SELECT * FROM Posts";
+    $result = $conn->query($sql);
+    if ($result->num_rows > 0) {
+        // output data of each row
+        while($row = $result->fetch_assoc()) {
+            if ($u==$row['username']){
+                if($row['num_posts'] < $USER_TIERS["Beginner"]){
+                    $rank = "Beginner";
+                    console_debug("GOT HERE! $rank");
+                } else if($row['num_posts'] < $USER_TIERS["Intermediate"]){
+                    $rank = "Intermediate";
+                } else {
+                    $rank = "Expert";
+                }
+            }
+        }
+
+    }
+
     //query for the user
     $sql = "SELECT * FROM Users WHERE username='{$u}'";
     $result = $conn->query($sql)->fetch_assoc();
@@ -76,25 +99,6 @@
     <h1>Homework Overflow</h1>
     <h4>Profile Info</h4>
     <?php
-    // get calculate rank
-    $rank = "Beginner";
-    //    $USER_TIERS = array("Beginner" => 20, "Intermediate" => 50, "Expert" => 100);
-    //
-    //    $sql = "SELECT * FROM Posts where username=$u";
-    //    $result = $conn->query($sql);
-    //    if ($result->num_rows > 0) {
-    //        // output data of each row
-    //        while($row = $result->fetch_assoc()) {
-    //            if($row['num_posts'] < $USER_TIERS["Beginner"]){
-    //                $rank = "Beginner";
-    //            } else if($row['num_posts'] < $USER_TIERS["Intermediate"]){
-    //                $rank = "Intermediate";
-    //            } else {
-    //                $rank = "Expert";
-    //            }
-    //            $rank = "*Error*";
-    //        }
-    //    }
     echo "Name: " . $result["username"] . "<br> Rank: $rank<br>";
     echo "Your Info: <br> Description:" . $result["pf"] . "<br> City: " . $result["city"] . "<br>";
     echo "State: ". $result["state"] . "<br> Country: " . $result["country"] . "<br><br><br>";

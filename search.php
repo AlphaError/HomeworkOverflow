@@ -94,6 +94,7 @@
                     ) as c on Answers.qid = c.qid
                 group by c.qid
                 order by numQ desc, numA desc;";
+        # TODO: order?
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {

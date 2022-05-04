@@ -72,6 +72,7 @@
     //if no cat is selected, give options to click and browse through
     else {
         echo "Choose a category:<br>";
+        // TODO: finish
     }
     ?>
 </div>
