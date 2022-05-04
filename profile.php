@@ -144,9 +144,8 @@
     //query for answers given by the user along with the question
     $sql = "SELECT Answers.aid, Answers.body, Answers.t, Questions.title, Questions.qid FROM Answers join Questions using(qid) where Answers.username = '{$u}'";
     $result = $conn->query($sql);
-    echo "<br>Answers Given:<br>";
+    echo "<br><br>Answers Given:<br>";
     if($result->num_rows > 0){
-        echo "<br><br>Answers Given:<br>";
         while($row = $result->fetch_assoc()){
 //BROKEN          //query for likes
             $num_likes = 0;
