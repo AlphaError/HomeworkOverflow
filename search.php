@@ -85,23 +85,43 @@
         }
 
         //search for matching questions sorted by number of keyword matches
-        $sql = "Select c.qid, title, count(aid) as numA
+        $sql = "Select *
+                From categories join(
+                Select c.username, c.t, c.qid, title, count(aid) as numA
                 from answers right join (
-                    SELECT title, qid, count(qid) as numQ
+                    SELECT username, t, title, qid, count(qid) as numQ
                     FROM Questions JOIN Categories USING(qid), keywords
                     WHERE LOCATE(keywords.word, questions.title) > 0
                     group by qid
                     ) as c on Answers.qid = c.qid
                 group by c.qid
-                order by numQ desc, numA desc;";
-        # TODO: order?
+                order by numQ desc, numA desc) as d using(qid);";
+        # TODO: order? already comes ordered by number of answers/keyword matches
         $result = $conn->query($sql);
 
+        # TODO: links to browse needs to consider if it is a category or a subcategory
         if ($result->num_rows > 0) {
             // output data of each row
+            //arrays for categories output
+            $questions = array();
+            $questionsText = array();
             while($row = $result->fetch_assoc()) {
-                $text = $row["title"] . " | " . $row["numA"] . " answers";
-                echo "<a href='question.php?qid=" . $row["qid"] . "'>$text</a><br>";
+                if(!in_array($row["qid"], $questions)){
+                    array_push($questions, $row["qid"]);
+                    array_push($questionsText, 
+                        "<br>------------------------------------------------------------<br>" .
+                        "<a href='question.php?qid={$row["qid"]}&title={$row["title"]}'>{$row["title"]}</a> " . 
+                        " | " . $row["numA"] . " answers<br>posted by 
+                        <a href='profile.php?u={$row["username"]}'>{$row["username"]}</a> at {$row["t"]}<br>" . 
+                        "<a href='browse.php?cat={$row['cat']}&sub='>{$row['cat']}</a>"
+                    );
+                } else {
+                    $key = array_search($row["qid"], $questions);
+                    $questionsText[$key] =  $questionsText[$key] . " and <a href='browse.php?cat={$row['cat']}&sub='>{$row['cat']}</a>";
+                }
+            }
+            foreach($questionsText as $text){
+                echo $text;
             }
         } else {
             echo "No results";

@@ -8,12 +8,7 @@
     $conn = sql_connect();
 
     $qid = strval($_GET["qid"]);
-
-    //query for the question
-    $sql = "SELECT * FROM Questions  join Categories using(qid) WHERE qid='{$qid}'";
-    $result = $conn->query($sql)->fetch_assoc();
-
-    $title = $result["title"];
+    $title = $_GET["title"];
 ?>
 
 <html>
@@ -76,10 +71,34 @@
         <?php echo "Title: " . $title; ?>
     </h3>
     <?php
-    //echo rest of the question
-    echo "Body: " . $result["body"] . "<br><br>";
-    echo "Posted by <a href='profile.php?u=" . $result["username"] . "'> {$result["username"]} </a>" . " at " . $result["t"] . " under the category ";
-    echo "<a href='browse.php?cat=" . $result["cat"] . "'> {$result["cat"]} </a>" . "<br><br><br>";
+    //query for the question
+    $sql = "SELECT * FROM Questions join Categories using(qid) WHERE qid='{$qid}'";
+    $result = $conn->query($sql);
+
+    //array of all categories
+    $cats = array();
+    $count = 0;
+
+    while($row = $result->fetch_assoc()){
+        array_push($cats, $row["cat"]);
+        if($count == 0){
+            //echo the question
+            echo "Body: " . $row["body"] . "<br><br>";
+            echo "Posted by <a href='profile.php?u=" . $row["username"] . "'> {$row["username"]} </a>" . " at " . $row["t"] . " under the category ";
+        }
+        $count++;
+    }
+
+    $count = 0;
+    foreach($cats as $cat){
+        if($count == 0){
+            echo "<a href='browse.php?cat={$cat}'> {$cat} </a>";
+        } else {
+            echo " and <a href='browse.php?cat={$cat}'> {$cat} </a>";
+        }
+        $count++;
+    }
+    echo "<br><br><br>";
 
     //query for answers
     $sql = "SELECT * FROM Answers WHERE qid='{$qid}'";
