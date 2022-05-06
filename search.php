@@ -99,10 +99,8 @@
                     ) as c on Answers.qid = c.qid
                 group by c.qid
                 order by numQ desc, numA desc) as d using(qid);";
-        # TODO: order? already comes ordered by number of answers/keyword matches
         $result = $conn->query($sql);
 
-        # TODO: links to browse needs to consider if it is a category or a subcategory
         if ($result->num_rows > 0) {
             // output data of each row
             //arrays for categories output

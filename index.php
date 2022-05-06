@@ -77,7 +77,7 @@
             //number of most recent questions to show here
             $count = 10;
 
-            //arrays for categories output
+            //arrays to manage multiple categories
             $questions = array();
             $questionsText = array();
 
@@ -109,6 +109,7 @@
                     }
                 }
             }
+            //actually output each question
             foreach($questionsText as $text){
                 echo $text;
             }

@@ -3,9 +3,9 @@
     function sql_connect(){
         $servername = "localhost";
         $username = "root";
-        $password = getenv('SQLSERVER_PW');
+        $password = "11006959";
         // Create connection
-        $conn = new mysqli($servername, $username, $password, "db_project");
+        $conn = new mysqli($servername, $username, $password, "sys");
     // Check connection
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);

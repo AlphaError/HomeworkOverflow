@@ -9,6 +9,7 @@
     //connect to SQL server
     $conn = sql_connect();
 
+    //store $_GET values for ease of use
     $qid = strval($_GET["qid"]);
     $title = $_GET["title"];
 ?>
@@ -76,7 +77,7 @@
         $sql = "SELECT * FROM Questions join Categories using(qid) WHERE qid='{$qid}'";
         $result = $conn->query($sql);
 
-        //array of all categories
+        //array to store the categories this question was posted under
         $cats = array();
         $count = 0;
 
@@ -90,7 +91,7 @@
             $count++;
         }
 
-        //echo categories
+        //echo the categories this question was posted under
         $count = 0;
         foreach($cats as $cat){
             if($count == 0){

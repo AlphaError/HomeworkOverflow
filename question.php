@@ -78,7 +78,7 @@
     $sql = "SELECT * FROM Questions join Categories using(qid) WHERE qid='{$qid}'";
     $result = $conn->query($sql);
 
-    //array of all categories
+    //array of all categories this question is posted under
     $cats = array();
     $count = 0;
 
@@ -98,6 +98,7 @@
         $count++;
     }
 
+    //echo the categories
     $count = 0;
     foreach($cats as $cat){
         if($count == 0){
@@ -208,8 +209,6 @@
             echo "<a href='answer.php?qid={$qid}&title={$title}'>Be the first to post an answer!</a>";
         }
     }
-
-    
     ?>
 </div>
 </html>

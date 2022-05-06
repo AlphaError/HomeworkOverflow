@@ -6,7 +6,6 @@
     include "functions.php";
     console_debug("session id: " . $_SESSION["user"]);
 
-
     $user = $_SESSION["user"];
     $u = $_GET["u"];
 
@@ -22,7 +21,6 @@
     $sql = "SELECT * FROM Posts";
     $result = $conn->query($sql);
     if ($result->num_rows > 0) {
-        // output data of each row
         while($row = $result->fetch_assoc()) {
             if ($u==$row['username']){
                 if($row['num_posts'] < $USER_TIERS["Beginner"]){
@@ -101,7 +99,9 @@
     <h1>Homework Overflow</h1>
     <h4>Profile</h4>
     <?php
+    //check if this is a valid username
     if($result->num_rows > 0){
+        //print user info
         $result = $result->fetch_assoc();
         echo $result["username"] . " ($rank)";
         if(!empty($result["pf"])){
@@ -118,10 +118,6 @@
             echo "<br>" . $result["country"];
         }
         echo "<br><br>";
-        //if logged in user is looking at own profile
-        if($mod){
-            console_debug("looking at own profile");
-        }
 
         //query for questions asked by the user
         $sql = "SELECT * FROM Questions join Categories using(qid) WHERE username='{$u}'";
@@ -193,7 +189,7 @@
                 echo "in response to the question <a href='question.php?qid=" . $row["qid"] . "&title=" . $row["title"] . "'>{$row["title"]}</a><br>" . " posted at " . $row["t"] . "<br>";
             }
         } else {
-            echo "...<br>";
+            echo "No answers have been posted yet<br>";
         }
     } else {
         echo "No user with that username exists.";
