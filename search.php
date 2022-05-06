@@ -5,6 +5,7 @@
     session_start();
     include "functions.php";
     console_debug("session id: " . $_SESSION["user"]);
+    $conn = sql_connect();
 ?>
 <html>
 <head>
@@ -67,36 +68,35 @@
     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"])?>" method="get">
         <input type="text" name="keywords" style="font-size:22px;width:500px">
         <input type="submit" style="font-size:22px;">
+
+        <br>Categories:<br>
+        <?php
+        //query for high level categories
+        $sql="SELECT cat FROM Topics WHERE cat=subcat";
+        $result = $conn->query($sql);
+        // $_GET["category"] Becomes category array from input checkboxes
+        while ($row = $result->fetch_assoc()) {
+            //echo a checkbox for the high level topic
+            echo '<input type="checkbox" name="category[]" value="' . $row["cat"] . '" id="' . $row["cat"] . '">
+                <label for="' . $row["cat"] . '">' . $row["cat"] . '</for><br>';
+
+            //query for sub-categories
+            $sql_sub="SELECT subcat FROM Topics WHERE cat!=subcat AND cat='{$row["cat"]}'";
+            $res = $conn->query($sql_sub);
+
+            if($res->num_rows>0){
+                while($r = $res->fetch_assoc()){
+                    //echo a checkbox for each low-level topic
+                    echo '&emsp;&emsp;<input type="checkbox" name="category[]" value="' . $r["subcat"] . '" id="' . $r["subcat"] . '">
+                        <label for="' . $r["subcat"] . '">' . $r["subcat"] . '</for><br>';
+                }
+            }
+        }
+        ?>
     </form>
 
     Category:
     <br>
-    <?php
-    $conn = sql_connect();
-
-    //query for high level categories
-    $sql="SELECT cat FROM Topics WHERE cat=subcat";
-    $result = $conn->query($sql);
-
-    while($row = $result->fetch_assoc()){
-        //echo a checkbox for the high level topic
-        echo '<input type="checkbox" name="category[]" value="' . $row["cat"] . '" id="' . $row["cat"] . '">
-                <label for="' . $row["cat"] . '">' . $row["cat"] . '</for><br>';
-
-        //query for sub-categories
-        $sql_sub="SELECT subcat FROM Topics WHERE cat!=subcat AND cat='{$row["cat"]}'";
-        $res = $conn->query($sql_sub);
-
-        if($res->num_rows>0){
-            while($r = $res->fetch_assoc()){
-                //echo a checkbox for each low-level topic
-                echo '&emsp;&emsp;<input type="checkbox" name="category[]" value="' . $r["subcat"] . '" id="' . $r["subcat"] . '">
-                        <label for="' . $r["subcat"] . '">' . $r["subcat"] . '</for><br>';
-            }
-        }
-    }
-    ?>
-
     <?php
     //connect to SQL server
 //    $conn = sql_connect();
