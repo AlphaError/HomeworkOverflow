@@ -138,14 +138,14 @@
                             "<br>------------------------------------------------------------<br>" .
                             "<a href='question.php?qid=" . $row["qid"] . "&title=" . $row["title"] . "'>{$row["title"]}</a> | Resolved<br>" .
                             $row['body'] . "<br>" .
-                            "posted at " . $row["t"] . "<br><a href='browse.php?cat=" . $row["cat"] . "'> {$row["cat"]} </a>"
+                            "posted at " . $row["t"] . "<br>Category: <a href='browse.php?cat=" . $row["cat"] . "'> {$row["cat"]} </a>"
                         );
                     } else {
                         array_push($questionsText,
                             "<br>------------------------------------------------------------<br>" .
                             "<a href='question.php?qid=" . $row["qid"] . "&title=" . $row["title"] . "'>{$row["title"]}</a> | Unresolved<br>" .
                             $row['body'] . "<br>" .
-                            "posted at " . $row["t"] . "<br><a href='browse.php?cat=" . $row["cat"] . "'> {$row["cat"]} </a>"
+                            "posted at " . $row["t"] . "<br>Category: <a href='browse.php?cat=" . $row["cat"] . "'> {$row["cat"]} </a>"
                         );
                     }
                 }
@@ -174,7 +174,7 @@
         if($result->num_rows > 0){
             while($row = $result->fetch_assoc()){
                 //query for number of likes
-                $sql_likes = "SELECT *, count(aid) as num FROM likes join answers using(aid) where aid = '{$row["aid"]}' group by aid";
+                $sql_likes = "select count(aid) as num from likes join answers using(aid) where aid = '{$row["aid"]}' group by aid";
                 $res = $conn->query($sql_likes);
 
                 if($res->num_rows > 0){
@@ -186,7 +186,7 @@
                 }
                 echo "------------------------------------------------------------<br>";
                 echo $row["body"] . "<br> received " . $num_likes . " likes ";
-                echo "in response to the question <a href='question.php?qid=" . $row["qid"] . "&title=" . $row["title"] . "'>{$row["title"]}</a><br>" . " posted at " . $row["t"] . "<br>";
+                echo "in response to the question <a href='question.php?qid=" . $row["qid"] . "&title=" . $row["title"] . "'>{$row["title"]}</a><br>" . " posted at " . $row["t"] . "<br><br>";
             }
         } else {
             echo "No answers have been posted yet<br>";

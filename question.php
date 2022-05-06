@@ -129,7 +129,7 @@
 
 
     //query for answers
-    $sql = "SELECT * FROM Answers WHERE qid='{$qid}'";
+    $sql = "SELECT * FROM Answers WHERE qid='{$qid}' order by best desc, t desc";
     $result = $conn->query($sql);
 
     $i = 0;

@@ -68,9 +68,38 @@
         <input type="text" name="keywords" style="font-size:22px;width:500px">
         <input type="submit" style="font-size:22px;">
     </form>
+
+    Category:
+    <br>
+    <?php
+    $conn = sql_connect();
+
+    //query for high level categories
+    $sql="SELECT cat FROM Topics WHERE cat=subcat";
+    $result = $conn->query($sql);
+
+    while($row = $result->fetch_assoc()){
+        //echo a checkbox for the high level topic
+        echo '<input type="checkbox" name="category[]" value="' . $row["cat"] . '" id="' . $row["cat"] . '">
+                <label for="' . $row["cat"] . '">' . $row["cat"] . '</for><br>';
+
+        //query for sub-categories
+        $sql_sub="SELECT subcat FROM Topics WHERE cat!=subcat AND cat='{$row["cat"]}'";
+        $res = $conn->query($sql_sub);
+
+        if($res->num_rows>0){
+            while($r = $res->fetch_assoc()){
+                //echo a checkbox for each low-level topic
+                echo '&emsp;&emsp;<input type="checkbox" name="category[]" value="' . $r["subcat"] . '" id="' . $r["subcat"] . '">
+                        <label for="' . $r["subcat"] . '">' . $r["subcat"] . '</for><br>';
+            }
+        }
+    }
+    ?>
+
     <?php
     //connect to SQL server
-    $conn = sql_connect();
+//    $conn = sql_connect();
 
     if($_SERVER["REQUEST_METHOD"] == "GET" && !empty($_GET["keywords"])) {
         //change keywords from string to array of substrings dilineated by a space
@@ -98,7 +127,7 @@
                     group by qid
                     ) as c on Answers.qid = c.qid
                 group by c.qid
-                order by numQ desc, numA desc) as d using(qid);";
+                order by numQ desc, resolved desc, numA desc) as d using(qid);";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
