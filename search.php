@@ -69,7 +69,7 @@
         <input type="text" name="keywords" style="font-size:22px;width:500px">
         <input type="submit" style="font-size:22px;">
 
-        <br>Categories:<br>
+        <br><br>Categories:<br>
         <?php
         //query for high level categories
         $sql="SELECT cat FROM Topics WHERE cat=subcat";
@@ -77,8 +77,8 @@
         // $_GET["category"] Becomes category array from input checkboxes
         while ($row = $result->fetch_assoc()) {
             //echo a checkbox for the high level topic
-            echo '<input type="checkbox" name="category[]" value="' . $row["cat"] . '" id="' . $row["cat"] . '">
-                <label for="' . $row["cat"] . '">' . $row["cat"] . '</for><br>';
+            echo "<select name=\"category[]\" multiple size = 6>";
+            echo "<option style=\"font-size: 20px;\" value=\"" .$row["cat"]. "\">" .$row["cat"]. "</option>";
 
             //query for sub-categories
             $sql_sub="SELECT subcat FROM Topics WHERE cat!=subcat AND cat='{$row["cat"]}'";
@@ -87,15 +87,13 @@
             if($res->num_rows>0){
                 while($r = $res->fetch_assoc()){
                     //echo a checkbox for each low-level topic
-                    echo '&emsp;&emsp;<input type="checkbox" name="category[]" value="' . $r["subcat"] . '" id="' . $r["subcat"] . '">
-                        <label for="' . $r["subcat"] . '">' . $r["subcat"] . '</for><br>';
+                    echo "<option style=\"font-size: 16px;\" value=\"" .$r["subcat"]. "\">" .$r["subcat"]. "</option>";
                 }
             }
+            echo "</select>";
         }
         ?>
     </form>
-
-    Category:
     <br>
     <?php
     //connect to SQL server
