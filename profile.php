@@ -147,7 +147,20 @@
         echo "<br><br>Answers Given:<br>";
         if($result->num_rows > 0){
             while($row = $result->fetch_assoc()){
-    //BROKEN          //query for likes
+                //query for number of likes
+                $sql_likes = "SELECT *, count(aid) as num FROM likes join answers using(aid) where aid = '{$row["aid"]}' group by aid";
+                $res = $conn->query($sql_likes);
+
+
+                if($res->num_rows > 0){
+                    while($r = $result->fetch_assoc()){
+                        //Mystery bug: "num" does not work, even though this exact bit works in question.php and you can access other parts of this query
+                        console_debug($r["t"]);
+                        //$num_likes = $r["num"];
+                    }
+                } else {
+                    $num_likes = 0;
+                }
                 $num_likes = 0;
                 echo "------------------------------------------------------------<br>";
                 echo $row["body"] . "<br> received " . $num_likes . " likes<br>";

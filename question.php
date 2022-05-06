@@ -79,12 +79,15 @@
     $cats = array();
     $count = 0;
 
+    $question_poster = "";
+
     while($row = $result->fetch_assoc()){
         array_push($cats, $row["cat"]);
         if($count == 0){
             //echo the question
             echo "Body: " . $row["body"] . "<br><br>";
             echo "Posted by <a href='profile.php?u=" . $row["username"] . "'> {$row["username"]} </a>" . " at " . $row["t"] . " under the category ";
+            $question_poster = $row["username"];
         }
         $count++;
     }
@@ -100,21 +103,89 @@
     }
     echo "<br><br><br>";
 
+
+
     //query for answers
     $sql = "SELECT * FROM Answers WHERE qid='{$qid}'";
     $result = $conn->query($sql);
 
+    $i = 0;
+
     if($result->num_rows > 0){
         while($row = $result->fetch_assoc()){
+            $i++;
             echo "------------------------------------------------------------<br>";
             echo $row["body"] . "<br> Posted by ";
             echo "<a href='profile.php?u=" . $row["username"] . "'> {$row["username"]} </a>";
-            echo " at " . $row["t"] . "<br><br>";
+            echo " at " . $row["t"] . "<br>";
+            //show best answer
+            if($row["best"] == 1){
+                echo "Best answer!<br>";
+            }
+            //best answer if question was posted by the user
+            if($_SESSION["user"] == $question_poster && $row["best"] != 1){
+                echo "<a href='best.php?aid={$row["aid"]}&qid={$qid}&title={$title}'>Mark as best answer</a><br>";
+            }
+            //TODO: Likes
+            //bool tracking if this user has liked this answer
+            $liked = 0;
+            //query to see all likes for an answer
+            $sql_likes = "SELECT Likes.username FROM Likes JOIN Answers USING(aid) WHERE aid='{$row["aid"]}'";
+            $res = $conn->query($sql_likes);
+
+            if($res->num_rows > 0){
+                while($r = $res->fetch_assoc()){
+                    //don't give option to like if this user has already liked it
+                    if($_SESSION["user"] == $r["username"]){
+                        $liked = 1;
+                    }
+                }
+            }
+            
+            //display number of likes
+            //query for number of likes
+            $sql_likes = "select count(aid) as num from likes join answers using(aid) where aid = '{$row["aid"]}' group by aid";
+            $res = $conn->query($sql_likes);
+
+            if($res->num_rows > 0){
+                while($r = $res->fetch_assoc()){
+                    echo $r["num"] . " ";
+                }
+            } else {
+                echo "0 ";
+            }
+
+            //if logged in, allow to like
+            if($_SESSION["user"] != ""){
+                echo "<a href='likes.php?aid={$row["aid"]}&qid={$qid}&title={$title}'>likes</a>";
+
+                if($liked == 1){
+                    echo " (already liked)";
+                }
+            } else {
+                echo "likes";
+            }
+
+
+            //new query for likes on this answer
+            echo "<br><br>";
+        }
+        //post an answer
+        if($_SESSION["user"] == ""){
+            echo "<a href='login.php'>Login</a> to post an answer!";
+        } else {
+            echo "<a href='answer.php?qid={$qid}&title={$title}'>Post your answer</a>";
         }
     } else {
-        echo "Be the first to post an answer!";
-        // TODO: add ability to answer
+        //check if logged in to give answer posting permissions
+        if($_SESSION["user"] == ""){
+            echo "<a href='login.php'>Login</a> to post an answer!";
+        } else {
+            echo "<a href='answer.php?qid={$qid}&title={$title}'>Be the first to post an answer!</a>";
+        }
     }
+
+    
     ?>
 </div>
 </html>

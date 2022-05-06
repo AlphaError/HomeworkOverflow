@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <?php
+    //mak this take only cat, not cat + sub
     session_start();
     include "functions.php";
     console_debug("session id: " . $_SESSION["user"]);
@@ -7,7 +8,14 @@
     $conn = sql_connect();
     
     $cat = $_GET["cat"];
-    $sub = $_GET["sub"];
+
+    //query for top-level categories and store them in an array
+    $categories = array();
+    $sql = "SELECT DISTINCT cat FROM Topics WHERE cat=subcat";
+    $result = $conn->query($sql);
+    while($row=$result->fetch_assoc()){
+        array_push($categories, $row["cat"]);
+    }
 ?>
 
 <html>
@@ -68,75 +76,72 @@
     <h1>Homework Overflow</h1>
     <h4>Browse</h4>
     <?php
-    //if cat is selected and sub is not selected, show sub-categories under that category and then all questions under the category
-    if($cat != "" && $sub == ""){
-        echo $cat . "<br>Choose a sub-category:<br><br>";
+        //if cat is not selected
+        if($cat == ""){
+            echo "Choose a category: <br>";
 
-        //query for sub-categories under this category
-        $sql = "SELECT subcat FROM Topics WHERE cat!=subcat AND cat='{$cat}'";
-        $result = $conn->query($sql);
-        if ($result->num_rows > 0) {
-            // output data of each row
-            while($row = $result->fetch_assoc()) {
-                console_debug($row["subcat"]);
-                echo "<a href='browse.php?cat={$cat}&sub={$row["subcat"]}'>{$row["subcat"]}</a><br>";
+            //list high level categories
+            foreach($categories as $val){
+                echo "<a href='browse.php?cat={$val}'>$val</a><br>";
             }
         }
-
-        echo "<br>Questions under the category {$cat}:<br><br>";
-
-        //query for questions under that category
-        $sql = "SELECT * FROM Questions JOIN Categories USING(qid) WHERE cat='{$cat}'";
-        $result = $conn->query($sql);
-        if ($result->num_rows > 0) {
-            // output data of each row
-            while($row = $result->fetch_assoc()) {
-                console_debug($row["title"]);
-                echo "------------------------------------------------------------<br>";
-                echo "<a href='question.php?qid={$row["qid"]}'&title={$row["title"]}>{$row["title"]}</a>";
-                echo " posted by <a href='profile.php?u={$row["username"]}'>{$row["username"]}</a> at {$row["t"]}<br>";
+        //if cat is selected
+        else {
+            //if cat is high level
+            if(in_array($cat, $categories)){
+                //print the chosen high level category
+                echo $cat . "<br><br>Choose a sub-category:<br>";
+                
+                //query and list subcategories
+                $sql = "SELECT subcat FROM Topics WHERE cat='{$cat}' AND subcat!='{$cat}'";
+                $result = $conn->query($sql);
+                while($row=$result->fetch_assoc()){
+                    echo "<a href='browse.php?cat={$row["subcat"]}'>{$row["subcat"]}</a><br>";
+                }
+                
+                //query and list questions under the high level category
+                $sql = "select *
+                    from questions join (
+                        select qid
+                        from topics right join categories on topics.subcat = categories.cat
+                        where topics.cat='{$cat}'
+                        order by qid) as c using(qid)";
+                $result = $conn->query($sql);
+                if($result->num_rows > 0){
+                    echo "<br><br>Questions under the category " . $cat . "<br><br>";
+                    while($row=$result->fetch_assoc()){
+                        echo "------------------------------------------------------------<br>" .
+                            "<a href='question.php?qid={$row["qid"]}&title={$row["title"]}'>{$row["title"]}</a> " . 
+                            " answers<br>posted by <a href='profile.php?u={$row["username"]}'>{$row["username"]}</a> at {$row["t"]}<br>";
+                    }
+                } else {
+                    echo "<br>No questions under this category have been posted yet.";
+                }
             }
-        } else {
-            echo "<a href='post.php'>Be the first to post a question under this category!</a>";
-        }
-    }
-    //if cat and sub are both selected, show questions under that category
-    else if($cat != "" && $sub != ""){
-        //How do you tab?
-        echo $cat . "<br>----" . $sub . "<br><br>";
-        
-        echo "Questions under the sub-category {$sub}:<br>";
+            //if cat is a subcategory
+            else {
+                //print the high level category
+                $sql = "SELECT cat FROM Topics WHERE subcat='{$cat}'";
+                echo $conn->query($sql)->fetch_assoc()["cat"];
 
-        //query for questions under that subcategory
-        $sql = "SELECT * FROM Questions JOIN Categories USING(qid) WHERE cat='{$sub}'";
-        $result = $conn->query($sql);
-        if ($result->num_rows > 0) {
-            // output data of each row
-            while($row = $result->fetch_assoc()) {
-                console_debug($row["title"]);
-                echo "------------------------------------------------------------<br>";
-                echo "<a href='question.php?qid={$row["qid"]}'&title={$row["title"]}>{$row["title"]}</a>";
-                echo " posted by <a href='profile.php?u={$row["username"]}'>{$row["username"]}</a> at {$row["t"]}<br>";
-            }
-        } else {
-            echo "<a href='post.php'>Be the first to post a question under this category!</a>";
-        }
-    }
-    //if no cat is selected, give options to click and browse through
-    else {
-        echo "Choose a category:<br><br>";
-        
-        //query for high level categories
-        $sql = "SELECT cat FROM Topics WHERE cat=subcat";
-        $result = $conn->query($sql);
-        if ($result->num_rows > 0) {
-            // output data of each row
-            while($row = $result->fetch_assoc()) {
-                console_debug($row["cat"]);
-                echo "<a href='browse.php?cat={$row["cat"]}&sub='>{$row["cat"]}</a><br>";
+                //print the sub-category
+                echo "<br>" . $cat;
+
+                //query and list questions under this sub-category
+                $sql = "SELECT * FROM Questions JOIN Categories USING(qid) WHERE cat='{$cat}'";
+                $result = $conn->query($sql);
+                if($result->num_rows > 0){
+                    echo  "<br><br>Questions under the sub-category " . $cat . ":<br>";
+                    while($row=$result->fetch_assoc()){
+                        echo "------------------------------------------------------------<br>" .
+                            "<a href='question.php?qid={$row["qid"]}&title={$row["title"]}'>{$row["title"]}</a> " . 
+                            " answers<br>posted by <a href='profile.php?u={$row["username"]}'>{$row["username"]}</a> at {$row["t"]}<br>";
+                    }
+                } else {
+                    echo "<br>No questions under this category have been posted yet.";
+                }
             }
         }
-    }
     ?>
 </div>
 </html>

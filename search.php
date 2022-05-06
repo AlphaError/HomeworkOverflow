@@ -113,11 +113,11 @@
                         "<a href='question.php?qid={$row["qid"]}&title={$row["title"]}'>{$row["title"]}</a> " . 
                         " | " . $row["numA"] . " answers<br>posted by 
                         <a href='profile.php?u={$row["username"]}'>{$row["username"]}</a> at {$row["t"]}<br>" . 
-                        "<a href='browse.php?cat={$row['cat']}&sub='>{$row['cat']}</a>"
+                        "<a href='browse.php?cat={$row['cat']}'>{$row['cat']}</a>"
                     );
                 } else {
                     $key = array_search($row["qid"], $questions);
-                    $questionsText[$key] =  $questionsText[$key] . " and <a href='browse.php?cat={$row['cat']}&sub='>{$row['cat']}</a>";
+                    $questionsText[$key] =  $questionsText[$key] . " and <a href='browse.php?cat={$row['cat']}'>{$row['cat']}</a>";
                 }
             }
             foreach($questionsText as $text){

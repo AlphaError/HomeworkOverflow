@@ -47,7 +47,7 @@
     <div class="sidenav">
         <?php
             echo "<br><a href=index.php>Home</a><br>";
-            echo "<a href='browse.php?cat=&sub='>Browse</a><br>";
+            echo "<a href='browse.php?cat='>Browse</a><br>";
             echo "<a href='search.php?keywords='>Search</a><br>";
             if($_SESSION["user"] == ""){
                 echo "<a href='login.php'>Login</a><br>";
