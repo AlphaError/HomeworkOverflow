@@ -1,4 +1,5 @@
 <?php
+    //helper file to mark best answer
     session_start();
     include "functions.php";
     $conn = sql_connect();

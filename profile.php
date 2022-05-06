@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <?php
+    //takes u via get
+
     session_start();
     include "functions.php";
     console_debug("session id: " . $_SESSION["user"]);
@@ -112,7 +114,7 @@
         //query for questions asked by the user
         $sql = "SELECT * FROM Questions join Categories using(qid) WHERE username='{$u}'";
         $result = $conn->query($sql);
-        echo "Questions Asked:<br>";
+        echo "Questions Asked:";
         if($result->num_rows > 0){
             //to prevent repeating a question if it has multiple categories
             $questions = array();
@@ -121,12 +123,23 @@
                 //if this qid is not already present, add it to the list of questions to be printed
                 if(!in_array($row["qid"], $questions)){
                     array_push($questions, $row["qid"]);
-                    array_push($questionsText,
-                        "<br>------------------------------------------------------------<br>" .
-                        "<a href='question.php?qid=" . $row["qid"] . "&title=" . $row["title"] . "'>{$row["title"]}</a><br>" .
-                        $row['body'] . "<br>" .
-                        "posted at " . $row["t"] . " under the category <a href='browse.php?cat=" . $row["cat"] . "'> {$row["cat"]} </a>"
-                    );
+                    
+                    //check if question is resolved
+                    if($row["resolved"] == 1){
+                        array_push($questionsText,
+                            "<br>------------------------------------------------------------<br>" .
+                            "<a href='question.php?qid=" . $row["qid"] . "&title=" . $row["title"] . "'>{$row["title"]}</a> | Resolved<br>" .
+                            $row['body'] . "<br>" .
+                            "posted at " . $row["t"] . "<br><a href='browse.php?cat=" . $row["cat"] . "'> {$row["cat"]} </a>"
+                        );
+                    } else {
+                        array_push($questionsText,
+                            "<br>------------------------------------------------------------<br>" .
+                            "<a href='question.php?qid=" . $row["qid"] . "&title=" . $row["title"] . "'>{$row["title"]}</a> | Unresolved<br>" .
+                            $row['body'] . "<br>" .
+                            "posted at " . $row["t"] . "<br><a href='browse.php?cat=" . $row["cat"] . "'> {$row["cat"]} </a>"
+                        );
+                    }
                 }
                 //if this qid is already present, add the category to the relevant text
                 else {
@@ -163,7 +176,7 @@
                 }
                 $num_likes = 0;
                 echo "------------------------------------------------------------<br>";
-                echo $row["body"] . "<br> received " . $num_likes . " likes<br>";
+                echo $row["body"] . "<br> received " . $num_likes . " likes ";
                 echo "in response to the question <a href='question.php?qid=" . $row["qid"] . "&title=" . $row["title"] . "'>{$row["title"]}</a><br>" . " posted at " . $row["t"] . "<br>";
             }
         } else {

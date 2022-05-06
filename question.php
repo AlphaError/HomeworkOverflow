@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <?php
+    //takes qid and title via get
+
     session_start();
     include "functions.php";
     console_debug("session id: " . $_SESSION["user"]);
@@ -81,6 +83,8 @@
 
     $question_poster = "";
 
+    $resolved = 0;
+
     while($row = $result->fetch_assoc()){
         array_push($cats, $row["cat"]);
         if($count == 0){
@@ -88,6 +92,7 @@
             echo "Body: " . $row["body"] . "<br><br>";
             echo "Posted by <a href='profile.php?u=" . $row["username"] . "'> {$row["username"]} </a>" . " at " . $row["t"] . " under the category ";
             $question_poster = $row["username"];
+            $resolved = $row["resolved"];
         }
         $count++;
     }
@@ -101,8 +106,24 @@
         }
         $count++;
     }
-    echo "<br><br><br>";
+    echo "<br><br>";
 
+    //if poster is logged in, allow to mark resolved/unresolved
+    if($_SESSION["user"] == $question_poster){
+        if($resolved == 0){
+            echo "<a href='resolve.php?qid={$qid}&title={$title}'>Mark as resolved</a>";
+        } else {
+            echo "<a href='resolve.php?qid={$qid}&title={$title}'>Mark as unresolved</a>";
+        }
+    } else {
+        //if not the question poster, display resolved status
+        if($resolved == 1){
+            echo "This question has been marked as resolved.";
+        } else {
+            echo "This question is unresolved.";
+        }
+    }
+    echo "<br><br>";
 
 
     //query for answers
@@ -126,7 +147,7 @@
             if($_SESSION["user"] == $question_poster && $row["best"] != 1){
                 echo "<a href='best.php?aid={$row["aid"]}&qid={$qid}&title={$title}'>Mark as best answer</a><br>";
             }
-            //TODO: Likes
+
             //bool tracking if this user has liked this answer
             $liked = 0;
             //query to see all likes for an answer
@@ -179,8 +200,10 @@
     } else {
         //check if logged in to give answer posting permissions
         if($_SESSION["user"] == ""){
+            echo "------------------------------------------------------------<br>";
             echo "<a href='login.php'>Login</a> to post an answer!";
         } else {
+            echo "------------------------------------------------------------<br>";
             echo "<a href='answer.php?qid={$qid}&title={$title}'>Be the first to post an answer!</a>";
         }
     }

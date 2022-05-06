@@ -1,4 +1,5 @@
 <?php
+    //helper file to like answers
     session_start();
     include "functions.php";
     $conn = sql_connect();
@@ -18,6 +19,5 @@
     //execute sql
     $conn->query($sql);
 
-    console_debug("location: question.php?qid={$_GET["qid"]}&title={$_GET["title"]}");
     header("location: question.php?qid={$_GET["qid"]}&title={$_GET["title"]}");
 ?>

@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <?php
+    //takes keywords via get
+    
     session_start();
     include "functions.php";
     console_debug("session id: " . $_SESSION["user"]);
@@ -87,9 +89,9 @@
         //search for matching questions sorted by number of keyword matches
         $sql = "Select *
                 From categories join(
-                Select c.username, c.t, c.qid, title, count(aid) as numA
+                Select resolved, c.username, c.t, c.qid, title, count(aid) as numA
                 from answers right join (
-                    SELECT username, t, title, qid, count(qid) as numQ
+                    SELECT resolved, username, t, title, qid, count(qid) as numQ
                     FROM Questions JOIN Categories USING(qid), keywords
                     WHERE LOCATE(keywords.word, questions.title) > 0
                     group by qid
@@ -108,13 +110,25 @@
             while($row = $result->fetch_assoc()) {
                 if(!in_array($row["qid"], $questions)){
                     array_push($questions, $row["qid"]);
-                    array_push($questionsText, 
+                    
+                    //consider if this question is resolved
+                    if($row["resolved"] == 1){
+                        array_push($questionsText, 
                         "<br>------------------------------------------------------------<br>" .
                         "<a href='question.php?qid={$row["qid"]}&title={$row["title"]}'>{$row["title"]}</a> " . 
-                        " | " . $row["numA"] . " answers<br>posted by 
+                        " | " . $row["numA"] . " answers | Resolved<br>posted by 
                         <a href='profile.php?u={$row["username"]}'>{$row["username"]}</a> at {$row["t"]}<br>" . 
                         "<a href='browse.php?cat={$row['cat']}'>{$row['cat']}</a>"
-                    );
+                        );
+                    } else {
+                        array_push($questionsText, 
+                            "<br>------------------------------------------------------------<br>" .
+                            "<a href='question.php?qid={$row["qid"]}&title={$row["title"]}'>{$row["title"]}</a> " . 
+                            " | " . $row["numA"] . " answers | Unresolved<br>posted by 
+                            <a href='profile.php?u={$row["username"]}'>{$row["username"]}</a> at {$row["t"]}<br>" . 
+                            "<a href='browse.php?cat={$row['cat']}'>{$row['cat']}</a>"
+                        );
+                    }
                 } else {
                     $key = array_search($row["qid"], $questions);
                     $questionsText[$key] =  $questionsText[$key] . " and <a href='browse.php?cat={$row['cat']}'>{$row['cat']}</a>";

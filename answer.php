@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <?php
+    //takes qid and title via get
+    
     session_start();
     include "functions.php";
     console_debug("session id: " . $_SESSION["user"]);

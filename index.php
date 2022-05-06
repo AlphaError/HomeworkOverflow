@@ -46,15 +46,19 @@
     </head>
     <div class="sidenav">
         <?php
-            echo "<br><a href=index.php>Home</a><br>";
-            echo "<a href='browse.php?cat='>Browse</a><br>";
-            echo "<a href='search.php?keywords='>Search</a><br>";
-            if($_SESSION["user"] == ""){
-                echo "<a href='login.php'>Login</a><br>";
-                echo "<a href='register.php'>Create Account</a>";
+            if(isset($_SESSION["user"])){
+                echo "<br><a href=index.php>Home</a><br>";
+                echo "<a href='browse.php?cat='>Browse</a><br>";
+                echo "<a href='search.php?keywords='>Search</a><br>";
+                if($_SESSION["user"] == ""){
+                    echo "<a href='login.php'>Login</a><br>";
+                    echo "<a href='register.php'>Create Account</a>";
+                } else {
+                    echo "<a href='profile.php?u=". $_SESSION["user"] ."'>View Profile</a><br>";
+                    echo "<a href='logout.php'>Logout</a><br>";
+                }
             } else {
-                echo "<a href='profile.php?u=". $_SESSION["user"] ."'>View Profile</a><br>";
-                echo "<a href='logout.php'>Logout</a><br>";
+                $_SESSION["user"] = "";
             }
         ?>
     </div>

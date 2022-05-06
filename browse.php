@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <?php
-    //mak this take only cat, not cat + sub
+    //takes cat via get
     session_start();
     include "functions.php";
     console_debug("session id: " . $_SESSION["user"]);
@@ -74,7 +74,9 @@
 
 <div class="main">
     <h1>Homework Overflow</h1>
-    <h4>Browse</h4>
+    <h4>Browse
+        <?php echo $cat;?>
+    </h4>
     <?php
         //if cat is not selected
         if($cat == ""){
@@ -89,8 +91,8 @@
         else {
             //if cat is high level
             if(in_array($cat, $categories)){
-                //print the chosen high level category
-                echo $cat . "<br><br>Choose a sub-category:<br>";
+                echo "Choose a sub-category:<br>";
+                echo "------------------------------------------------------------<br>";
                 
                 //query and list subcategories
                 $sql = "SELECT subcat FROM Topics WHERE cat='{$cat}' AND subcat!='{$cat}'";
@@ -108,11 +110,18 @@
                         order by qid) as c using(qid)";
                 $result = $conn->query($sql);
                 if($result->num_rows > 0){
-                    echo "<br><br>Questions under the category " . $cat . "<br><br>";
+                    echo "<br>Questions under the category " . $cat . ":<br>";
                     while($row=$result->fetch_assoc()){
+                        //check for resolved state
+                        if($row["resolved"] == 1){
                         echo "------------------------------------------------------------<br>" .
-                            "<a href='question.php?qid={$row["qid"]}&title={$row["title"]}'>{$row["title"]}</a> " . 
-                            " answers<br>posted by <a href='profile.php?u={$row["username"]}'>{$row["username"]}</a> at {$row["t"]}<br>";
+                            "<a href='question.php?qid={$row["qid"]}&title={$row["title"]}'>{$row["title"]}</a> | Resolved" . 
+                            "<br>posted by <a href='profile.php?u={$row["username"]}'>{$row["username"]}</a> at {$row["t"]}<br>";
+                        } else {
+                            echo "------------------------------------------------------------<br>" .
+                                "<a href='question.php?qid={$row["qid"]}&title={$row["title"]}'>{$row["title"]}</a> | Unresolved" . 
+                                "<br>posted by <a href='profile.php?u={$row["username"]}'>{$row["username"]}</a> at {$row["t"]}<br>";
+                        }
                     }
                 } else {
                     echo "<br>No questions under this category have been posted yet.";

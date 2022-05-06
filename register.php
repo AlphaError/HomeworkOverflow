@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <?php
+    //account creation page takes no inputs
+
     session_start();
     include "functions.php";
 

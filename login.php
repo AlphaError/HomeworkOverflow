@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <?php
+    //login page takes no inputs
+    
     session_start();
     include "functions.php";
 
