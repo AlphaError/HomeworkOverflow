@@ -27,7 +27,7 @@
         }
         .sidenav {
             height: 100%;
-            width: 200px;
+            width: 220px;
             position: fixed;
             z-index: 1;
             top: 0;
@@ -47,7 +47,7 @@
             color: #f1f1f1;
         }
         .main {
-            margin-left: 210px; /* Same as the width of the sidenav */
+            margin-left: 230px; /* Same as the width of the sidenav */
             font-size: 28px; /* Increased text to enable scrolling */
             padding: 0px 10px;
         }
@@ -66,6 +66,7 @@
         echo "<a href='login.php'>Login</a><br>";
         echo "<a href='register.php'>Create Account</a>";
     } else {
+        echo "<a href='post.php'>Post a Question</a><br>";
         echo "<a href='profile.php?u=". $_SESSION["user"] ."'>View Profile</a><br>";
         echo "<a href='logout.php'>Logout</a><br>";
     }
@@ -75,12 +76,18 @@
 <div class="main">
     <h1>Homework Overflow</h1>
     <h4>Browse
-        <?php echo $cat;?>
+        <?php 
+            if($cat == ""){
+                echo " by Category";
+            } else {
+                echo $cat;
+            }
+        ?>
     </h4>
     <?php
         //if cat is not selected
         if($cat == ""){
-            echo "Choose a category: <br>";
+            echo "<b>Choose a category: </b><br>";
 
             //list high level categories
             foreach($categories as $val){
@@ -91,7 +98,7 @@
         else {
             //if cat is high level
             if(in_array($cat, $categories)){
-                echo "Choose a sub-category:<br>";
+                echo "<b>Choose a sub-category:</b><br>";
                 echo "------------------------------------------------------------<br>";
                 
                 //query and list subcategories
@@ -107,10 +114,11 @@
                         select qid
                         from topics right join categories on topics.subcat = categories.cat
                         where topics.cat='{$cat}'
-                        order by qid) as c using(qid)";
+                        order by qid) as c using(qid)
+                        ORDER BY t DESC";
                 $result = $conn->query($sql);
                 if($result->num_rows > 0){
-                    echo "<br>Questions under the category " . $cat . ":<br>";
+                    echo "<br><b>Questions under the category " . $cat . ":</b><br>";
                     while($row=$result->fetch_assoc()){
                         //check for resolved state
                         if($row["resolved"] == 1){
@@ -124,7 +132,12 @@
                         }
                     }
                 } else {
-                    echo "<br>No questions under this category have been posted yet.";
+                    echo "<br>";
+                    if($_SESSION["user"] != ""){
+                        echo "<br><a href='post.php'>Be the first to post a question under this category</a>";
+                    } else {
+                        echo "<br><a href='login.php'>Login</a> to post a question under this category";
+                    }
                 }
             }
             //if cat is a subcategory
@@ -137,17 +150,29 @@
                 echo "<br>" . $cat;
 
                 //query and list questions under this sub-category
-                $sql = "SELECT * FROM Questions JOIN Categories USING(qid) WHERE cat='{$cat}'";
+                $sql = "SELECT * FROM Questions JOIN Categories USING(qid) WHERE cat='{$cat}' ORDER BY t DESC";
                 $result = $conn->query($sql);
                 if($result->num_rows > 0){
-                    echo  "<br><br>Questions under the sub-category " . $cat . ":<br>";
+                    echo  "<br><br><b>Questions under the sub-category " . $cat . ":</b><br>";
                     while($row=$result->fetch_assoc()){
-                        echo "------------------------------------------------------------<br>" .
-                            "<a href='question.php?qid={$row["qid"]}&title={$row["title"]}'>{$row["title"]}</a> " . 
-                            " answers<br>posted by <a href='profile.php?u={$row["username"]}'>{$row["username"]}</a> at {$row["t"]}<br>";
+                        //check for resolved state
+                        if($row["resolved"] == 1){
+                            echo "------------------------------------------------------------<br>" .
+                                "<a href='question.php?qid={$row["qid"]}&title={$row["title"]}'>{$row["title"]}</a> | Resolved" . 
+                                "<br>posted by <a href='profile.php?u={$row["username"]}'>{$row["username"]}</a> at {$row["t"]}<br>";
+                        } else {
+                            echo "------------------------------------------------------------<br>" .
+                                "<a href='question.php?qid={$row["qid"]}&title={$row["title"]}'>{$row["title"]}</a> | Unresolved" . 
+                                "<br>posted by <a href='profile.php?u={$row["username"]}'>{$row["username"]}</a> at {$row["t"]}<br>";
+                        }
                     }
                 } else {
-                    echo "<br>No questions under this category have been posted yet.";
+                    echo "<br>";
+                    if($_SESSION["user"] != ""){
+                        echo "<br><a href='post.php'>Be the first to post a question under this category</a>";
+                    } else {
+                        echo "<br><a href='login.php'>Login</a> to post a question under this category";
+                    }
                 }
             }
         }

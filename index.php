@@ -3,6 +3,8 @@
   session_start();
   include "functions.php";
   console_debug("session id: " . $_SESSION["user"]);
+
+  $conn = sql_connect();
 ?>
 
 <html>
@@ -14,7 +16,7 @@
             }
             .sidenav {
                 height: 100%;
-                width: 200px;
+                width: 220px;
                 position: fixed;
                 z-index: 1;
                 top: 0;
@@ -34,7 +36,7 @@
                 color: #f1f1f1;
             }
             .main {
-                margin-left: 210px; /* Same as the width of the sidenav */
+                margin-left: 230px; /* Same as the width of the sidenav */
                 font-size: 28px; /* Increased text to enable scrolling */
                 padding: 0px 10px;
             }
@@ -54,6 +56,7 @@
                     echo "<a href='login.php'>Login</a><br>";
                     echo "<a href='register.php'>Create Account</a>";
                 } else {
+                    echo "<a href='post.php'>Post a Question</a><br>";
                     echo "<a href='profile.php?u=". $_SESSION["user"] ."'>View Profile</a><br>";
                     echo "<a href='logout.php'>Logout</a><br>";
                 }
@@ -66,5 +69,49 @@
     <div class="main">
         <h1>Homework Overflow</h1>
         <h3>   aka Kora and Michael's amazing database project that helps you get homework answers!</h3>
+        Most recent questions asked:
+        <?php
+            $sql="SELECT * FROM Questions JOIN Categories USING(qid) ORDER BY t DESC";
+            $result = $conn->query($sql);
+
+            //number of most recent questions to show here
+            $count = 10;
+
+            //arrays for categories output
+            $questions = array();
+            $questionsText = array();
+
+            while($row = $result->fetch_assoc()){
+                if(count($questions) < $count){
+                    if(!in_array($row["qid"], $questions)){
+                        array_push($questions, $row["qid"]);
+                        //consider if this question is resolved
+                        if($row["resolved"] == 1){
+                            array_push($questionsText, 
+                            "<br>------------------------------------------------------------<br>" .
+                            "<a href='question.php?qid={$row["qid"]}&title={$row["title"]}'>{$row["title"]}</a> " . 
+                            " | Resolved<br>posted by 
+                            <a href='profile.php?u={$row["username"]}'>{$row["username"]}</a> at {$row["t"]}<br>" . 
+                            "<a href='browse.php?cat={$row['cat']}'>{$row['cat']}</a>"
+                            );
+                        } else {
+                            array_push($questionsText, 
+                                "<br>------------------------------------------------------------<br>" .
+                                "<a href='question.php?qid={$row["qid"]}&title={$row["title"]}'>{$row["title"]}</a> " . 
+                                " | Unresolved<br>posted by 
+                                <a href='profile.php?u={$row["username"]}'>{$row["username"]}</a> at {$row["t"]}<br>" . 
+                                "<a href='browse.php?cat={$row['cat']}'>{$row['cat']}</a>"
+                            );
+                        }
+                    } else {
+                        $key = array_search($row["qid"], $questions);
+                        $questionsText[$key] =  $questionsText[$key] . " and <a href='browse.php?cat={$row['cat']}'>{$row['cat']}</a>";
+                    }
+                }
+            }
+            foreach($questionsText as $text){
+                echo $text;
+            }
+        ?>
     </div>
 </html>

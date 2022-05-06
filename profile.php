@@ -17,7 +17,7 @@
 
     // calculating user's rank
     $rank = "*Error*";
-    $USER_TIERS = array("Beginner" => 20, "Intermediate" => 50, "Expert" => 100);
+    $USER_TIERS = array("Beginner" => 4, "Intermediate" => 8, "Expert" => 10);
 
     $sql = "SELECT * FROM Posts";
     $result = $conn->query($sql);
@@ -27,7 +27,6 @@
             if ($u==$row['username']){
                 if($row['num_posts'] < $USER_TIERS["Beginner"]){
                     $rank = "Beginner";
-                    console_debug("GOT HERE! $rank");
                 } else if($row['num_posts'] < $USER_TIERS["Intermediate"]){
                     $rank = "Intermediate";
                 } else {
@@ -52,7 +51,7 @@
         }
         .sidenav {
             height: 100%;
-            width: 200px;
+            width: 220px;
             position: fixed;
             z-index: 1;
             top: 0;
@@ -72,7 +71,7 @@
             color: #f1f1f1;
         }
         .main {
-            margin-left: 210px; /* Same as the width of the sidenav */
+            margin-left: 230px; /* Same as the width of the sidenav */
             font-size: 28px; /* Increased text to enable scrolling */
             padding: 0px 10px;
         }
@@ -91,6 +90,7 @@
         echo "<a href='login.php'>Login</a><br>";
         echo "<a href='register.php'>Create Account</a>";
     } else {
+        echo "<a href='post.php'>Post a Question</a><br>";
         echo "<a href='profile.php?u=". $_SESSION["user"] ."'>View Profile</a><br>";
         echo "<a href='logout.php'>Logout</a><br>";
     }
@@ -99,13 +99,25 @@
 
 <div class="main">
     <h1>Homework Overflow</h1>
-    <h4>Profile Info</h4>
+    <h4>Profile</h4>
     <?php
     if($result->num_rows > 0){
         $result = $result->fetch_assoc();
-        echo "Name: " . $result["username"] . "<br> Rank: $rank<br>";
-        echo "Your Info: <br> Description:" . $result["pf"] . "<br> City: " . $result["city"] . "<br>";
-        echo "State: ". $result["state"] . "<br> Country: " . $result["country"] . "<br><br><br>";
+        echo $result["username"] . " ($rank)";
+        if(!empty($result["pf"])){
+            echo "<br>" . $result["pf"];
+        }
+        if(!empty($result["city"]) && !empty($result["state"])){
+            echo "<br><br>" . $result["city"] . ", " . $result["state"];
+        } else if(!empty($result["city"])){
+            echo "<br><br>" . $result["city"];
+        } else {
+            echo "<br><br>" . $result["state"];
+        }
+        if(!empty($result["country"])){
+            echo "<br>" . $result["country"];
+        }
+        echo "<br><br>";
         //if logged in user is looking at own profile
         if($mod){
             console_debug("looking at own profile");
@@ -114,7 +126,7 @@
         //query for questions asked by the user
         $sql = "SELECT * FROM Questions join Categories using(qid) WHERE username='{$u}'";
         $result = $conn->query($sql);
-        echo "Questions Asked:";
+        echo "<b>Questions Asked:</b>";
         if($result->num_rows > 0){
             //to prevent repeating a question if it has multiple categories
             $questions = array();
@@ -151,30 +163,31 @@
                 echo $value . "<br>";
             }
         } else {
-            echo "...<br>";
+            echo "<br>------------------------------------------------------------";
+            if($user == $u){
+                echo "<br><a href='post.php'>Post your first question</a>";
+            } else {
+                echo "<br>No questions asked yet";
+            }
         }
 
         //query for answers given by the user along with the question
         $sql = "SELECT Answers.aid, Answers.body, Answers.t, Questions.title, Questions.qid FROM Answers join Questions using(qid) where Answers.username = '{$u}'";
         $result = $conn->query($sql);
-        echo "<br><br>Answers Given:<br>";
+        echo "<br><br><b>Answers Given:</b><br>";
         if($result->num_rows > 0){
             while($row = $result->fetch_assoc()){
                 //query for number of likes
                 $sql_likes = "SELECT *, count(aid) as num FROM likes join answers using(aid) where aid = '{$row["aid"]}' group by aid";
                 $res = $conn->query($sql_likes);
 
-
                 if($res->num_rows > 0){
-                    while($r = $result->fetch_assoc()){
-                        //Mystery bug: "num" does not work, even though this exact bit works in question.php and you can access other parts of this query
-                        console_debug($r["t"]);
-                        //$num_likes = $r["num"];
+                    while($r = $res->fetch_assoc()){
+                        $num_likes = $r["num"];
                     }
                 } else {
                     $num_likes = 0;
                 }
-                $num_likes = 0;
                 echo "------------------------------------------------------------<br>";
                 echo $row["body"] . "<br> received " . $num_likes . " likes ";
                 echo "in response to the question <a href='question.php?qid=" . $row["qid"] . "&title=" . $row["title"] . "'>{$row["title"]}</a><br>" . " posted at " . $row["t"] . "<br>";

@@ -47,7 +47,7 @@
         }
         .sidenav {
             height: 100%;
-            width: 200px;
+            width: 220px;
             position: fixed;
             z-index: 1;
             top: 0;
@@ -67,7 +67,7 @@
             color: #f1f1f1;
         }
         .main {
-            margin-left: 210px; /* Same as the width of the sidenav */
+            margin-left: 230px; /* Same as the width of the sidenav */
             font-size: 28px; /* Increased text to enable scrolling */
             padding: 0px 10px;
         }
@@ -86,6 +86,7 @@
         echo "<a href='login.php'>Login</a><br>";
         echo "<a href='register.php'>Create Account</a>";
     } else {
+        echo "<a href='post.php'>Post a Question</a><br>";
         echo "<a href='profile.php?u=". $_SESSION["user"] ."'>View Profile</a><br>";
         echo "<a href='logout.php'>Logout</a><br>";
     }
@@ -97,7 +98,7 @@
     <style>
         .error {color: #FF0000;}
     </style>
-    <h4>LOGIN:</h4>
+    <h4>Login</h4>
     <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
         Userame: <input type="text" name="username"><br>
         Password: <input type="text" name="password"><br>

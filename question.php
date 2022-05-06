@@ -22,7 +22,7 @@
         }
         .sidenav {
             height: 100%;
-            width: 200px;
+            width: 220px;
             position: fixed;
             z-index: 1;
             top: 0;
@@ -42,7 +42,7 @@
             color: #f1f1f1;
         }
         .main {
-            margin-left: 210px; /* Same as the width of the sidenav */
+            margin-left: 230px; /* Same as the width of the sidenav */
             font-size: 28px; /* Increased text to enable scrolling */
             padding: 0px 10px;
         }
@@ -61,6 +61,7 @@
         echo "<a href='login.php'>Login</a><br>";
         echo "<a href='register.php'>Create Account</a>";
     } else {
+        echo "<a href='post.php'>Post a Question</a><br>";
         echo "<a href='profile.php?u=". $_SESSION["user"] ."'>View Profile</a><br>";
         echo "<a href='logout.php'>Logout</a><br>";
     }
@@ -70,7 +71,7 @@
 <div class="main">
     <h1>Homework Overflow</h1>
     <h3>
-        <?php echo "Title: " . $title; ?>
+        <?php echo $title; ?>
     </h3>
     <?php
     //query for the question
@@ -89,7 +90,7 @@
         array_push($cats, $row["cat"]);
         if($count == 0){
             //echo the question
-            echo "Body: " . $row["body"] . "<br><br>";
+            echo $row["body"] . "<br><br>";
             echo "Posted by <a href='profile.php?u=" . $row["username"] . "'> {$row["username"]} </a>" . " at " . $row["t"] . " under the category ";
             $question_poster = $row["username"];
             $resolved = $row["resolved"];
@@ -123,7 +124,7 @@
             echo "This question is unresolved.";
         }
     }
-    echo "<br><br>";
+    echo "<br><br><b>Answers:</b><br>";
 
 
     //query for answers
