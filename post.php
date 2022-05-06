@@ -166,29 +166,28 @@
         Category:
         <br>
         <?php
-            //query for high level categories
-            $sql="SELECT cat FROM Topics WHERE cat=subcat";
-            $result = $conn->query($sql);
+        //query for high level categories
+        $sql="SELECT cat FROM Topics WHERE cat=subcat";
+        $result = $conn->query($sql);
+        while ($row = $result->fetch_assoc()) {
+            //echo a checkbox for the high level topic
+            echo "<select name=\"category[]\" multiple size = 6>";
+            echo "<option style=\"font-size: 21px;\" value=\"" .$row["cat"]. "\">" .$row["cat"]. "</option>";
 
-            while($row = $result->fetch_assoc()){
-                //echo a checkbox for the high level topic
-                echo '<input type="checkbox" name="category[]" value="' . $row["cat"] . '" id="' . $row["cat"] . '">
-                <label for="' . $row["cat"] . '">' . $row["cat"] . '</for><br>';
+            //query for sub-categories
+            $sql_sub="SELECT subcat FROM Topics WHERE cat!=subcat AND cat='{$row["cat"]}'";
+            $res = $conn->query($sql_sub);
 
-                //query for sub-categories
-                $sql_sub="SELECT subcat FROM Topics WHERE cat!=subcat AND cat='{$row["cat"]}'";
-                $res = $conn->query($sql_sub);
-
-                if($res->num_rows>0){
-                    while($r = $res->fetch_assoc()){
-                        //echo a checkbox for each low-level topic
-                        echo '&emsp;&emsp;<input type="checkbox" name="category[]" value="' . $r["subcat"] . '" id="' . $r["subcat"] . '">
-                        <label for="' . $r["subcat"] . '">' . $r["subcat"] . '</for><br>';
-                    }
+            if($res->num_rows>0){
+                while($r = $res->fetch_assoc()){
+                    //echo a checkbox for each low-level topic
+                    echo "<option style=\"font-size: 18px;\" value=\"" .$r["subcat"]. "\">" .$r["subcat"]. "</option>";
                 }
             }
+            echo "</select> ";
+        }
         ?>
-        <span class="error"><?php echo $catErr;?></span><br>
+        <br><span class="error"><?php echo $catErr;?></span><br>
 
         <input type="submit" style="font-size:30px;height:50px;width:140px">
     </form>
