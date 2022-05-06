@@ -77,8 +77,8 @@
         // $_GET["category"] Becomes category array from input checkboxes
         while ($row = $result->fetch_assoc()) {
             //echo a checkbox for the high level topic
-            echo "<select name=\"category[]\" multiple size = 8>";
-            echo "<option style=\"font-size: 20px;\" value=\"" .$row["cat"]. "\">" .$row["cat"]. "</option>";
+            echo "<select name=\"category[]\" multiple size = 6>";
+            echo "<option style=\"font-size: 21px;\" value=\"" .$row["cat"]. "\">" .$row["cat"]. "</option>";
 
             //query for sub-categories
             $sql_sub="SELECT subcat FROM Topics WHERE cat!=subcat AND cat='{$row["cat"]}'";
@@ -87,10 +87,10 @@
             if($res->num_rows>0){
                 while($r = $res->fetch_assoc()){
                     //echo a checkbox for each low-level topic
-                    echo "<option style=\"font-size: 17px;\" value=\"" .$r["subcat"]. "\">" .$r["subcat"]. "</option>";
+                    echo "<option style=\"font-size: 18px;\" value=\"" .$r["subcat"]. "\">" .$r["subcat"]. "</option>";
                 }
             }
-            echo "</select>";
+            echo "</select> ";
         }
         ?>
     </form>
@@ -121,8 +121,8 @@
         }
 
         //search for matching questions sorted by number of keyword matches
-        $sql = "Select *
-                From topics join categories using(cat) join(
+        $sql = "Select qid, resolved, numA, title, t, categories.cat, username
+                From categories join(
                 Select resolved, c.username, c.t, c.qid, title, count(aid) as numA
                 from answers right join (
                     SELECT resolved, username, t, title, qid, count(qid) as numQ
@@ -132,6 +132,7 @@
                     ) as c on Answers.qid = c.qid
                 group by c.qid
                 order by numQ desc, resolved desc, numA desc) as d using(qid)
+                    left join Topics on categories.cat = subcat
                 $categorySearch;";
         $result = $conn->query($sql);
 
@@ -164,7 +165,8 @@
                     }
                 } else {
                     $key = array_search($row["qid"], $questions);
-                    $questionsText[$key] =  $questionsText[$key] . " and <a href='browse.php?cat={$row['cat']}'>{$row['cat']}</a>";
+                    $questionsText[$key] =  $questionsText[$key] .
+                        " and <a href='browse.php?cat={$row['cat']}'>{$row['cat']}</a>";
                 }
             }
             foreach($questionsText as $text){
