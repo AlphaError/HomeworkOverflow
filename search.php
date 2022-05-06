@@ -77,7 +77,7 @@
         // $_GET["category"] Becomes category array from input checkboxes
         while ($row = $result->fetch_assoc()) {
             //echo a checkbox for the high level topic
-            echo "<select name=\"category[]\" multiple size = 6>";
+            echo "<select name=\"category[]\" multiple size = 8>";
             echo "<option style=\"font-size: 20px;\" value=\"" .$row["cat"]. "\">" .$row["cat"]. "</option>";
 
             //query for sub-categories
@@ -87,7 +87,7 @@
             if($res->num_rows>0){
                 while($r = $res->fetch_assoc()){
                     //echo a checkbox for each low-level topic
-                    echo "<option style=\"font-size: 16px;\" value=\"" .$r["subcat"]. "\">" .$r["subcat"]. "</option>";
+                    echo "<option style=\"font-size: 17px;\" value=\"" .$r["subcat"]. "\">" .$r["subcat"]. "</option>";
                 }
             }
             echo "</select>";
@@ -99,10 +99,16 @@
     //connect to SQL server
 //    $conn = sql_connect();
 
-    if($_SERVER["REQUEST_METHOD"] == "GET" && !empty($_GET["keywords"])) {
+    if(!empty($_GET["keywords"]) or isset($_GET["category"])) {
         //change keywords from string to array of substrings dilineated by a space
         console_debug("Searching for keywords " . $_GET["keywords"] . "...");
         $keywordSearch = explode(" ", $_GET["keywords"]);
+
+        $categorySearch = "";
+        if (isset($_GET["category"])) {
+            $categorySearch = "where subcat=\"" . implode("\" or subcat=\"", $_GET["category"]) . "\";";
+            console_debug("where subcat=\"$categorySearch\"");
+        }
 
         //create temporary table with each keyword
         $sql = "CREATE TEMPORARY TABLE keywords(word varchar(24));";
@@ -116,7 +122,7 @@
 
         //search for matching questions sorted by number of keyword matches
         $sql = "Select *
-                From categories join(
+                From topics join categories using(cat) join(
                 Select resolved, c.username, c.t, c.qid, title, count(aid) as numA
                 from answers right join (
                     SELECT resolved, username, t, title, qid, count(qid) as numQ
@@ -125,7 +131,8 @@
                     group by qid
                     ) as c on Answers.qid = c.qid
                 group by c.qid
-                order by numQ desc, resolved desc, numA desc) as d using(qid);";
+                order by numQ desc, resolved desc, numA desc) as d using(qid)
+                $categorySearch;";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
