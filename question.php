@@ -125,6 +125,8 @@
             echo "This question is unresolved.";
         }
     }
+    
+
     echo "<br><br><b>Answers:</b><br>";
 
 

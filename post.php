@@ -34,7 +34,6 @@
             $valid = false;
         } else {
             $title = input_validation($_POST["title"]);
-            console_debug($title);
         }
 
         //check for body errors
@@ -43,7 +42,6 @@
             $valid = false;
         } else {
             $body = input_validation($_POST["body"]);
-            console_debug($body);
         }
 
         //check if a category has been chosen

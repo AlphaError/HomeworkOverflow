@@ -117,12 +117,14 @@
         if(!empty($result["country"])){
             echo "<br>" . $result["country"];
         }
+        if($user == $u){
+            echo "<br>" . $result["email"];
+        }
         echo "<br><br>";
 
         //give page to edit user profile if this is your profile
         if($u == $user){
             echo "<a href='edit.php?u={$u}'>Edit Profile</a><br><br>";
-            console_debug("same");
         }
 
         //query for questions asked by the user
@@ -188,18 +190,6 @@
                             echo "Best answer!<br>&emsp;&emsp;";
                         }
 
-                        //query to see all likes for an answer
-                        $sql_likes = "SELECT Likes.username FROM Likes JOIN Answers USING(aid) WHERE aid='{$row["aid"]}'";
-                        $res = $conn->query($sql_likes);
-
-                        if($res->num_rows > 0){
-                            while($r = $res->fetch_assoc()){
-                                //don't give option to like if this user has already liked it
-                                if($_SESSION["user"] == $r["username"]){
-                                    $liked = 1;
-                                }
-                            }
-                        }
                         //query for number of likes
                         $sql_likes = "select count(aid) as num from likes join answers using(aid) where aid = '{$row["aid"]}' group by aid";
                         $res = $conn->query($sql_likes);

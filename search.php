@@ -107,7 +107,6 @@
         $categorySearch = "";
         if (isset($_GET["category"])) {
             $categorySearch = "where subcat=\"" . implode("\" or subcat=\"", $_GET["category"]) . "\";";
-            console_debug("where subcat=\"$categorySearch\"");
         }
 
         //create temporary table with each keyword
