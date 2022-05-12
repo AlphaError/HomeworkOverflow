@@ -15,7 +15,7 @@
     $conn = sql_connect();
 
     // calculating user's rank
-    $rank = "*Error*";
+    $rank = "Beginner";
     $USER_TIERS = array("Beginner" => 4, "Intermediate" => 8, "Expert" => 10);
 
     $sql = "SELECT * FROM Posts";
