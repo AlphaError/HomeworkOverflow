@@ -29,7 +29,7 @@
         //if this username/pw combo exists in the DB, create session variable username and go to home page
         if ($result->num_rows > 0) {
             $_SESSION["user"] = $username;
-            header("Location: /index.php");
+            header("Location: /profile.php?u={$username}");
         }
         //if no results, give error message
         else {

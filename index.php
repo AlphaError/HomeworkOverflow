@@ -2,7 +2,6 @@
 <?php
   session_start();
   include "functions.php";
-  console_debug("session id: " . $_SESSION["user"]);
 
   $conn = sql_connect();
 ?>

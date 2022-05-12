@@ -119,6 +119,12 @@
         }
         echo "<br><br>";
 
+        //give page to edit user profile if this is your profile
+        if($u == $user){
+            echo "<a href='edit.php?u={$u}'>Edit Profile</a><br><br>";
+            console_debug("same");
+        }
+
         //query for questions asked by the user
         $sql = "SELECT * FROM Questions join Categories using(qid) WHERE username='{$u}'";
         $result = $conn->query($sql);
@@ -155,8 +161,60 @@
                     $questionsText[$index] = $questionsText[$index] . "and " . "<a href='browse.php?cat=" . $row["cat"] . "'> {$row["cat"]} </a>";
                 }
             }
-            foreach($questionsText as $value){
-                echo $value . "<br>";
+
+            //echo each question and all answers for this question
+            foreach($questionsText as $index => $text){
+                echo $text . "<br>";
+                
+                //set qid for the current question listed
+                $qid = $questions[$index];
+
+                //get question title
+                $sql = "SELECT title FROM Questions WHERE qid='{$qid}'";
+                $title = $conn->query($sql)->fetch_assoc()["title"];
+
+                //search and post for all answers to this QID
+                $sql = "SELECT * FROM Answers WHERE qid='{$qid}' order by best desc, t desc";
+                $result = $conn->query($sql);
+
+                if($result->num_rows > 0){
+                    while($row = $result->fetch_assoc()){
+                        echo "&emsp;&emsp;------------------------------------------------------------<br>&emsp;&emsp;";
+                        echo $row["body"] . "<br>&emsp;&emsp;Posted by ";
+                        echo "<a href='profile.php?u=" . $row["username"] . "'> {$row["username"]} </a>";
+                        echo " at " . $row["t"] . "<br>&emsp;&emsp;";
+                        //show best answer
+                        if($row["best"] == 1){
+                            echo "Best answer!<br>&emsp;&emsp;";
+                        }
+
+                        //query to see all likes for an answer
+                        $sql_likes = "SELECT Likes.username FROM Likes JOIN Answers USING(aid) WHERE aid='{$row["aid"]}'";
+                        $res = $conn->query($sql_likes);
+
+                        if($res->num_rows > 0){
+                            while($r = $res->fetch_assoc()){
+                                //don't give option to like if this user has already liked it
+                                if($_SESSION["user"] == $r["username"]){
+                                    $liked = 1;
+                                }
+                            }
+                        }
+                        //query for number of likes
+                        $sql_likes = "select count(aid) as num from likes join answers using(aid) where aid = '{$row["aid"]}' group by aid";
+                        $res = $conn->query($sql_likes);
+
+                        if($res->num_rows > 0){
+                            while($r = $res->fetch_assoc()){
+                                echo $r["num"] . " ";
+                            }
+                        } else {
+                            echo "0 ";
+                        }
+
+                        echo "likes<br>";
+                    }
+                }
             }
         } else {
             echo "<br>------------------------------------------------------------";
@@ -191,6 +249,7 @@
         } else {
             echo "No answers have been posted yet<br>";
         }
+
     } else {
         echo "No user with that username exists.";
     }
